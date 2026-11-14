@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Демонстрація транспортного квитка</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #a8d7d4;
+  font-family: Arial, sans-serif;
+  color: #303030;
+}
+
+/* Основна картка */
+.ticket {
+  background: #fff;
+  border-radius: 7px;
+  margin: 15px 15px 0;
+  padding: 22px 15px 16px;
+  text-align: center;
+  box-shadow: 0 2px 5px #0002;
+  position: relative;
+}
+
+/* Назва та герб */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  color: #888;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.info-icon {
+  margin-left: auto;
+  color: #168ac6;
+  background: transparent;
+  border: none;
+  font-size: 21px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Дані */
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 9px 0;
+  font-size: 14px;
+}
+
+.info span:first-child {
+  color: #888;
+}
+
+.number {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Пунктир */
+
+.dash {
+  position: relative;
+  border-top: 2px dashed #eee;
+  margin: 24px 0 32px;
+}
+
+.dash::before,
+.dash::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #a8d7d4;
+  border-radius: 50%;
+  top: -11px;
+  z-index: 2;
+}
+
+/* Лівий виріз */
+.dash::before {
+  left: -25px;
+}
+
+/* Правий виріз */
+.dash::after {
+  right: -25px;
+}
+
+/* Картинка */
+.character {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 25px 0;
+  min-height: 80px;
+}
+
+.qr-image {
+  width: 80px;
+  height: 80px;
+  max-width: 100%;
+  object-fit: contain;
+  transition: width .2s, height .2s;
+}
+
+.qr-image.qr-expanded {
+  width: 230px;
+  height: 230px;
+}
+
+/* Кнопка */
+.qr-button {
+  background: white;
+  border: 1px solid #81b15b;
+  color: #69a347;
+  border-radius: 7px;
+  padding: 11px 16px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Деталі */
+.details {
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.details small {
+  display: block;
+  color: #888;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.details strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.label {
+  margin: 24px 0 8px;
+  font-size: 16px;
+}
+
+.timer {
+  color: #6aaa43;
+  font-size: 21px;
+  font-weight: bold;
+}
+
+.type {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 6px 10px;
+  background: #e4f4dc;
+  color: #74a751;
+  font-size: 12px;
+  border-radius: 4px;
+}
+
+.demo-label {
+  font-size: 12px;
+  color: #a44;
+  font-weight: bold;
+  margin-top: 14px;
+}
+
+.note {
+  text-align: center;
+  font-size: 11px;
+  color: #729d9a;
+  margin-top: 10px;
+  padding: 0 20px;
+}
+
+/* Вікно додаткових даних */
+#infoModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  z-index: 100;
+}
+
+.info-sheet {
+  position: absolute;
+  top: 15%;
+  bottom: 0;
+  width: 100%;
+  background: #add8d6;
+  border-radius: 18px 18px 0 0;
+  padding: 22px 8px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-close {
+  align-self: flex-start;
+  border: none;
+  background: none;
+  font-size: 34px;
+  color: #111;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.sheet-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 18px 12px 12px;
+  color: #111;
+}
+
+.sheet-card {
+  background: white;
+  border-radius: 9px;
+  padding: 18px 16px;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.sheet-field {
+  margin-bottom: 19px;
+}
+
+.sheet-field:last-child {
+  margin-bottom: 0;
+}
+
+.sheet-field .field-label {
+  color: #999;
+  margin-bottom: 4px;
+}
+
+.sheet-field .field-value {
+  color: #292929;
+}
+
+.sheet-bottom {
+  margin-top: auto;
+}
+
+.sheet-button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(
+    110deg, #40c44c, #189aa7
+  );
+  color: white;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 360px) {
+  .brand { font-size: 12px; }
+  .ticket { padding: 20px 13px; }
+}
+</style>
+</head>
+
+<body>
+
+<main class="ticket">
+
+  <div class="brand">
+    <img
+      src="https://upload.wikimedia.org/wikipedia/commons/4/49/Coat_of_Arms_of_Odesa.svg"
+      class="logo"
+      alt="Герб Одеси"
+    >
+
+    <span>Одесміськелектротранс</span>
+
+    <button
+      class="info-icon"
+      onclick="openInfo()"
+      aria-label="Додаткові дані"
+    >ⓘ</button>
+  </div>
+
+  <div class="info">
+    <span>Серія</span>
+    <span>PB №978284213</span>
+  </div>
+
+  <div class="info">
+    <span>Бортовий номер</span>
+    <span class="number">0047</span>
+  </div>
+
+  <div class="dash"></div>
+
+  <!-- Картинка змінюється після натискання -->
+  <div class="character">
+    <img
+      src="./Qr.png"
+      id="ticketImage"
+      class="qr-image"
+      alt="Ілюстрація квитка"
+    >
+  </div>
+
+  <button
+    class="qr-button"
+    id="qrButton"
+    onclick="showQR()"
+  >
+    Переглянути QR ❯
+  </button>
+
+  <div class="details">
+    <div>
+      <small>Дата</small>
+      <strong id="date"></strong>
+    </div>
+
+    <div>
+      <small>Сума</small>
+      <strong>15</strong>
+    </div>
+
+    <div>
+      <small>Квитків</small>
+      <strong>1</strong>
+    </div>
+  </div>
+
+  <div class="label">
+    Квиток разового використання
+  </div>
+
+  <div class="timer" id="timer">54:25</div>
+
+  <div class="type">
+    Квиток Проїзд(загальний)
+  </div>
+
+  <div class="demo-label">
+   
+  </div>
+
+</main>
+
+<div class="note">
+  Ви зможете заново відкрити цю сторінку
+  через історію браузера
+</div>
+
+<!-- Додаткові дані -->
+<div id="infoModal">
+  <div class="info-sheet">
+
+    <button
+      class="sheet-close"
+      onclick="closeInfo()"
+      aria-label="Закрити"
+    >×</button>
+
+    <div class="sheet-title">
+      Додаткові дані
+    </div>
+
+    <div class="sheet-card">
+
+      <div class="sheet-field">
+        <div class="field-label">Юридична особа</div>
+        <div class="field-value">
+          КП "ОДЕСМІСЬКЕЛЕКТРОТРАНС"
+        </div>
+      </div>
+
+      <div class="sheet-field">
+        <div class="field-label">Код ЄДРПОУ</div>
+        <div class="field-value">03328497</div>
+      </div>
+
+      <div class="sheet-field">
+        <div class="field-label">Зареєстровано</div>
+        <div class="field-value">20.01.1998</div>
+      </div>
+
+      <div class="sheet-field">
+        <div class="field-label">
+          Місцезнаходження юридичної особи
+        </div>
+        <div class="field-value">
+          вулиця Водопровідна, 1,<br>
+          Одеса, Одеська область, 65000
+        </div>
+      </div>
+
+    </div>
+
+    <div class="sheet-bottom">
+      <button class="sheet-button" onclick="closeInfo()">
+        Закрити
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// Дата
+const now = new Date();
+
+document.getElementById("date").textContent =
+  now.toLocaleDateString("uk-UA", {
+    day: "numeric",
+    month: "short"
+  }) + " " +
+  now.toLocaleTimeString("uk-UA", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+// Таймер
+let seconds = 54 * 60 + 25;
+
+function updateTimer() {
+  const minutes = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+
+  document.getElementById("timer").textContent =
+    String(minutes).padStart(2, "0") + ":" +
+    String(secs).padStart(2, "0");
+
+  if (seconds > 0) seconds--;
+}
+
+updateTimer();
+setInterval(updateTimer, 1000);
+
+// Заміна картинки без модального вікна
+function showQR() {
+  const img = document.getElementById("ticketImage");
+  const button = document.getElementById("qrButton");
+
+  if (img.classList.contains("qr-expanded")) {
+    img.src = "./Qr.png";
+    img.alt = "Ілюстрація квитка";
+    img.classList.remove("qr-expanded");
+    button.textContent = "Переглянути QR ❯";
+  } else {
+    img.src = "./code.png";
+    img.alt = "Демонстраційне зображення QR";
+    img.classList.add("qr-expanded");
+    button.textContent = "Приховати QR ❮";
+  }
+}
+
+// Додаткові дані
+function openInfo() {
+  document.getElementById("infoModal").style.display = "block";
+  document.body.style.overflow = "hidden";
+}
+
+function closeInfo() {
+  document.getElementById("infoModal").style.display = "none";
+  document.body.style.overflow = "";
+}
+</script>
+
+</body>
+</html>
