@@ -114,8 +114,8 @@ body {
 }
 
 .qr-image {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   max-width: 100%;
   object-fit: contain;
   transition: width .2s, height .2s;
@@ -352,7 +352,7 @@ body {
     Квиток разового використання
   </div>
 
-  <div class="timer" id="timer">54:25</div>
+  <div class="timer" id="timer">59:59</div>
 
   <div class="type">
     Квиток Проїзд(загальний)
@@ -438,7 +438,7 @@ document.getElementById("date").textContent =
   });
 
 // Таймер
-let seconds = 54 * 60 + 25;
+let seconds = 59 * 60 + 59;
 
 function updateTimer() {
   const minutes = Math.floor(seconds / 60);
