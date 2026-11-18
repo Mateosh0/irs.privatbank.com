@@ -310,7 +310,7 @@ body {
 
   <div class="info">
     <span>Бортовий номер</span>
-    <span class="number">0021</span>
+    <span class="number" id="boardNumber" contenteditable="true" inputmode="numeric" aria-label="Редагувати бортовий номер" spellcheck="false">0021</span>
   </div>
 
   <div class="dash"></div>
@@ -473,6 +473,37 @@ function showQR() {
     button.textContent = "Приховати QR ❮";
   }
 }
+
+// Редагування чотирьох цифр бортового номера
+const boardNumber = document.getElementById("boardNumber");
+let previousBoardNumber = boardNumber.textContent;
+
+boardNumber.addEventListener("input", () => {
+  const digits = boardNumber.textContent.replace(/\\D/g, "").slice(0, 4);
+  boardNumber.textContent = digits;
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(boardNumber);
+  range.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(range);
+});
+
+boardNumber.addEventListener("blur", () => {
+  const digits = boardNumber.textContent.replace(/\\D/g, "").slice(0, 4);
+  if (digits.length === 4) {
+    previousBoardNumber = digits;
+  } else {
+    boardNumber.textContent = previousBoardNumber;
+  }
+});
+
+boardNumber.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    boardNumber.blur();
+  }
+});
 
 // Додаткові дані
 function openInfo() {
