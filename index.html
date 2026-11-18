@@ -341,12 +341,12 @@ body {
 
     <div>
       <small>Сума</small>
-      <strong>30</strong>
+      <strong id="ticketAmount" contenteditable="true" inputmode="numeric" aria-label="Редагувати суму" spellcheck="false">30</strong>
     </div>
 
     <div>
       <small>Квитків</small>
-      <strong>2</strong>
+      <strong id="ticketCount" contenteditable="true" inputmode="numeric" aria-label="Редагувати кількість квитків" spellcheck="false">2</strong>
     </div>
   </div>
 
@@ -504,6 +504,42 @@ boardNumber.addEventListener("keydown", (event) => {
     boardNumber.blur();
   }
 });
+
+
+// Редагування суми та кількості квитків без зміни їхнього стилю
+function enableNumericEditing(id) {
+  const element = document.getElementById(id);
+  let previousValue = element.textContent;
+
+  element.addEventListener("input", () => {
+    const digits = element.textContent.replace(/\D/g, "");
+    element.textContent = digits;
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    range.collapse(false);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  });
+
+  element.addEventListener("blur", () => {
+    if (/^\d+$/.test(element.textContent)) {
+      previousValue = element.textContent;
+    } else {
+      element.textContent = previousValue;
+    }
+  });
+
+  element.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      element.blur();
+    }
+  });
+}
+
+enableNumericEditing("ticketAmount");
+enableNumericEditing("ticketCount");
 
 // Додаткові дані
 function openInfo() {
